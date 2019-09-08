@@ -5,7 +5,11 @@ IMPORT Std.system.Thorlib;
 
 
 EXPORT DBSCAN(REAL8 eps = 0, UNSIGNED4 minPts = 2, STRING dist = 'euclidian', SET OF REAL8 dist_params = []):= MODULE
-
+  // Return the partially clustered result of performing DBSCAN on points present only in one node
+  // locDBSCAN takes as input a dataset distributed such that all points are available in all nodes, but only
+  // some points are 'local' to each node. locDBSCAN performs DBSCAN on these 'local' points, while using the
+  // whole set of points to form neighbors, resulting in 'local' and 'remote' neighbors. This partial DBSCAN
+  // clustering is returned, per node.
   EXPORT STREAMED DATASET(Files.l_stage3) locDBSCAN(STREAMED DATASET(Files.l_stage2) dsIn, //distributed data from stage 1
                                                     REAL8 eps = eps,   //distance threshold
                                                     UNSIGNED minPts = minPts, //the minimum number of points required to form a cluster,
