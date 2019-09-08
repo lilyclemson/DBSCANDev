@@ -588,7 +588,16 @@ EXPORT DBSCAN(REAL8 eps = 0, UNSIGNED4 minPts = 2, STRING dist = 'euclidian', SE
     result1 := result0 + outliers1;
     RETURN result1;
   END;//end fit()
-
+  /**
+    * Num_Clusters
+    *
+    * Provides the number of clusters that the given dataset will be divided into
+    * when clustered by the DBSCAN algorithm.
+    *
+    * @param ds The dataset to be used for the clustering operation in DATASET(NumericField) format
+    * @return DATASET(l_num_clusters) The number of clusters, per work item.
+    * @see DBSCAN_Types.l_num_clusters
+    */
   EXPORT DATASET(Files.l_num_clusters) Num_Clusters(DATASET(Types.NumericField) ds) := FUNCTION
     //Find clustering of ds
     clustering := Fit(ds);
@@ -600,7 +609,16 @@ EXPORT DBSCAN(REAL8 eps = 0, UNSIGNED4 minPts = 2, STRING dist = 'euclidian', SE
                                           SELF.num := LEFT.num));
     RETURN result1;
   END;//end Num_Clusters()
-
+  /**
+    * Num_Outliers
+    *
+    * Provides the number of outliers that the given dataset will have
+    * when clustered by the DBSCAN algorithm.
+    *
+    * @param ds The dataset to be used for the clustering operation in DATASET(NumericField) format
+    * @return DATASET(l_num_clusters) The number of outliers, per work item.
+    * @see DBSCAN_Types.l_num_clusters
+    */
   EXPORT DATASET(Files.l_num_clusters) Num_Outliers(DATASET(Types.NumericField) ds) := FUNCTION
     //Find clustering of ds
     clustering := Fit(ds);
