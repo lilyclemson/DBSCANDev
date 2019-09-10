@@ -21,9 +21,12 @@ IMPORT Std.system.Thorlib;
     * @param params        Set of additional parameters needed for distance functions
     * @param localNode     Parameter that indicates which node the code is running on
     */
-  EXPORT STREAMED DATASET(Files.l_stage3) locDBSCAN(STREAMED DATASET(Files.l_stage2) dsIn, //distributed data from stage 1
+  EXPORT STREAMED DATASET(Files.l_stage3) locDBSCAN(STREAMED DATASET(Files.l_stage2) dsIn, 
+                                                    //distributed data from stage 1
                                                     REAL8 eps = 0.0,   //distance threshold
-                                                    UNSIGNED minPts = 2, //the minimum number of points required to form a cluster,
+                                                    UNSIGNED minPts = 2, 
+                                                    //the minimum number of points required to
+                                                    //form a cluster,
                                                     STRING distance_func = 'euclidean',
                                                     SET OF REAL8 params = [],
                                                     UNSIGNED4 localNode = Thorlib.node()
@@ -215,7 +218,7 @@ IMPORT Std.system.Thorlib;
             }
         }
     }
-
+    // The data structure for the return layout.
     struct retRecord{
     uint32_t wi;
     uint32_t id;
@@ -224,10 +227,12 @@ IMPORT Std.system.Thorlib;
     bool if_local;
     bool if_core;
     };
-
+    //ResultStream Interface returns the resulting rows as a stream for global merge phase.
+    //Uses retRecord datastructure to store the results of local clustering
     class ResultStream : public RtlCInterface, implements IRowStream {
     public:
-        ResultStream(IEngineRowAllocator *_ra, IRowStream *_ds, uint64_t minpts, double eps, unsigned long long lnode) : ra(_ra), ds(_ds), Lnode(lnode){
+        ResultStream(IEngineRowAllocator *_ra, IRowStream *_ds, uint64_t minpts, double eps, 
+                                        unsigned long long lnode) : ra(_ra), ds(_ds), Lnode(lnode){
             byte* p;
             count = 0;
             while((p=(byte*)ds->nextRow())){
@@ -253,7 +258,7 @@ IMPORT Std.system.Thorlib;
 
             dbscan(results, eps, minpts);
         }
-
+        //Returning  row by row via Interface
         RTLIMPLEMENT_IINTERFACE
         virtual const void* nextRow() override {
             RtlDynamicRowBuilder rowBuilder(ra);
@@ -292,15 +297,15 @@ IMPORT Std.system.Thorlib;
     };
 
     #body
-
+    //Main cpp code. Setting the distance function type like 'euclidean','haversine',etc.
     distanceFunc = distance_func;
     double* p = (double*)params;
 
     for(uint32_t i=0; i<lenParams/sizeof(double); ++i){
         dist_params.push_back(*p);
-        p += sizeof(double);
+        p += sizeof(double); 
     }
-
+    //converting the input string to lower case by transform.
     transform(distanceFunc.begin(),distanceFunc.end(),distanceFunc.begin(),::tolower);
 
     return new ResultStream(_resultAllocator, dsin, minpts, eps, localnode);
