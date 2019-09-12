@@ -198,14 +198,23 @@ EXPORT globalMerge := MODULE
                                       SELF.id := LEFT.ultimateID,
                                       SELF.newParentID := LEFT.largestID), LOCAL);
         changes := DEDUP(SORT(tempChanges, wi, id, -newParentID, LOCAL), wi, id, LOCAL);
-        newParent := JOIN(ds, changes, LEFT.wi = RIGHT.wi AND LEFT.id = RIGHT.id, TRANSFORM(RECORDOF(LEFT),
-                                                              SELF.parentID := IF(right.id > 0, RIGHT.newParentID, LEFT.parentID),
-                                                              SELF := LEFT), LEFT OUTER, LOCAL);
-
+        newParent := JOIN(ds, changes,
+                          LEFT.wi = RIGHT.wi
+                          AND
+                          LEFT.id = RIGHT.id,
+                          TRANSFORM(RECORDOF(LEFT),
+                                    SELF.parentID := IF(right.id > 0,
+                                                        RIGHT.newParentID,
+                                                        LEFT.parentID),
+                                    SELF := LEFT), LEFT OUTER, LOCAL);
         newUltimate :=  Ultimate(newParent, c);
-        rst := JOIN(newParent, newUltimate, LEFT.wi = RIGHT.wi AND LEFT.id = RIGHT.id, TRANSFORM(l_ultimate,
-                                                          SELF.ultimateID := RIGHT.parentID,
-                                                          SELF := LEFT));
+        rst := JOIN(newParent, newUltimate,
+                    LEFT.wi = RIGHT.wi
+                    AND
+                    LEFT.id = RIGHT.id,
+                    TRANSFORM(l_ultimate,
+                              SELF.ultimateID := RIGHT.parentID,
+                              SELF := LEFT));
         RETURN rst;
   END;//end loop_func()
 
