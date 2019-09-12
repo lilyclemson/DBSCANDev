@@ -56,9 +56,13 @@ mod := DBSCAN.DBSCAN(0.3, 2, dist := 'chebyshev').fit(trainNF);
 OUTPUT(mod, NAMED('mod'));
 
 // Accuracy test : The result shows the accuracy of our results compared to SK_learn results.
-evl := JOIN(mod, testNF, LEFT.wi = RIGHT.wi AND LEFT.id = RIGHT.id, TRANSFORM({UNSIGNED4 id, INTEGER ecl, INTEGER sk, BOOLEAN same},
-                                                  SELF.same := IF(LEFT.label = (RIGHT.value + 1), TRUE, FALSE),
-                                                  SELF.ecl := LEFT.label,
-                                                  SELF.sk := RIGHT.value,
-                                                  SELF := LEFT));
+evl := JOIN(mod, testNF,
+            LEFT.wi = RIGHT.wi
+            AND
+            LEFT.id = RIGHT.id,
+            TRANSFORM({UNSIGNED4 id, INTEGER ecl, INTEGER sk, BOOLEAN same},
+                      SELF.same := IF(LEFT.label = (RIGHT.value + 1), TRUE, FALSE),
+                      SELF.ecl := LEFT.label,
+                      SELF.sk := RIGHT.value,
+                      SELF := LEFT));
 OUTPUT((1-COUNT(evl(same = FALSE))/COUNT(mod)), NAMED('evl'));
